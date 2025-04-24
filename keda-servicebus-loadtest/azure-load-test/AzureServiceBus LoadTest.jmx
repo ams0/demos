@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="AzureServiceBus LoadTest">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="sb_policy_name" elementType="Argument">
+            <stringProp name="Argument.name">sb_policy_name</stringProp>
+            <stringProp name="Argument.value">${__GetSecret(sb_policy_name)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="LoadTesting">
+        <intProp name="ThreadGroup.num_threads">100</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">100</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler guiclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.gui.AzServiceBusSamplerGui" testclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler" testname="Azure Service Bus Sampler">
+          <boolProp name="createTransaction">false</boolProp>
+          <stringProp name="createTransacionName"></stringProp>
+          <boolProp name="continueTransaction">true</boolProp>
+          <boolProp name="commitTransaction">false</boolProp>
+          <boolProp name="rollbackTransaction">false</boolProp>
+          <elementProp name="messages" elementType="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessages" guiclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.gui.AzServiceBusMessagesPanel" testclass="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessages" testname="[res_key=Azure Event Hubs Default]">
+            <collectionProp name="Messages.messages">
+              <elementProp name="Welcome to Microsoft Integration User Group!" elementType="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessage">
+                <stringProp name="Message.messageType">String</stringProp>
+                <stringProp name="Message.message">Welcome to Microsoft Integration User Group!</stringProp>
+                <stringProp name="Message.partitionKey"></stringProp>
+                <stringProp name="Message.messageId"></stringProp>
+                <stringProp name="Message.groupId"></stringProp>
+                <stringProp name="Message.customProperties"></stringProp>
+                <stringProp name="Message.contentType"></stringProp>
+                <stringProp name="Message.label"></stringProp>
+                <stringProp name="Message.standardProperties"></stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <elementProp name="svcparams" elementType="jp.co.pnop.jmeter.protocol.azureservicebus.common.AzServiceBusClientParams" guiclass="jp.co.pnop.jmeter.protocol.azureservicebus.common.gui.AzServiceBusClientParamsPanel" testclass="jp.co.pnop.jmeter.protocol.azureservicebus.common.AzServiceBusClientParams">
+            <stringProp name="connectionType">Create New Connection</stringProp>
+            <stringProp name="definedConnectionName"></stringProp>
+            <stringProp name="connectionName"></stringProp>
+            <stringProp name="namespaceName">keda-demo-is-rubicon.servicebus.windows.net</stringProp>
+            <stringProp name="authType">Shared access signature</stringProp>
+            <stringProp name="sharedAccessKeyName">queuerule</stringProp>
+            <stringProp name="sharedAccessKey">TFsY4n554eY/3J7fVbnF3YYj91lPmS/1u+ASbLL16C8=</stringProp>
+            <stringProp name="aadCredential"></stringProp>
+            <stringProp name="destType">Queue</stringProp>
+            <stringProp name="queueName">demo-queue</stringProp>
+            <stringProp name="protocol">AMQP</stringProp>
+          </elementProp>
+        </jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler>
+        <hashTree>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">if (prev.isSuccessful() &amp;&amp; (prev.getResponseCode() == null || prev.getResponseCode() == &quot;&quot;)) {
+    prev.setResponseCode(&quot;200&quot;);
+}</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
