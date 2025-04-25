@@ -115,14 +115,72 @@ kubectl apply -f scaledobject.yaml
 
 ### 4. Test with Azure Load Testing
 
+Create a Keyvault to store the connection string:
+
+```bash
+az keyvault create \
+   -n ${CLUSTER_NAME}999 \
+   --resource-group $CLUSTER_RG \
+   --location $LOCATION \
+   --enable-rbac-authorization false
+```
+
+Add yourself as a Keyvault admin:
+
+```bash
+az keyvault set-policy \
+   --name ${CLUSTER_NAME}999 \
+   --resource-group $CLUSTER_RG \
+   --upn $(az ad signed-in-user show --query userPrincipalName -o tsv) \
+   --secret-permissions get list set delete \
+   --enable-soft-delete true \
+   --soft-delete-retention-days 7
+```
+Store the connection string in the Keyvault:
+
+
+```bash
+PRIMARY_KEY=$(az servicebus queue authorization-rule keys list -g $CLUSTER_RG \
+--namespace-name keda-demo-azcloudative \
+--queue-name demo-queue -n queuerule \
+--query "primaryKey" -o tsv)
+
+az keyvault secret set \
+   --vault-name ${CLUSTER_NAME}999 \
+   --name sendAccessKey \
+   --value $PRIMARY_KEY -o none
+```
+
 1. Create an Azure Load Testing resource:
 
 ```bash
-az load test create \
-  --resource-group keda-demo-rg \
-  --name keda-load-test \
-  --location eastus
+az load create -g $CLUSTER_RG \
+-l $LOCATION \
+-n keda-test \
+--identity-type SystemAssigned \
+--no-wait
 ```
+
+Add the test maua
+
+Get the Azure Load Test System Assigned Identity:
+
+```bash
+LOAD_TEST_IDENTITY=$(az load show \
+   --name keda-test -o json \
+   --resource-group $CLUSTER_RG \
+--query identity.principalId -o tsv)
+```
+Assign the Keyvault access policy to the Load Test System Assigned Identity:
+
+```bash
+az keyvault set-policy \
+   --name ${CLUSTER_NAME}999 \
+   --resource-group $CLUSTER_RG \
+   --object-id $LOAD_TEST_IDENTITY \
+   --secret-permissions get list
+```
+
 
 1. Configure a load test to send messages to the Service Bus queue. Use a tool like Apache JMeter or a custom script to generate traffic.
 
@@ -130,6 +188,20 @@ az load test create \
 
 
 ### 5. Monitor with Grafana
+
+Create an Azure Managed Grafana instance or use an existing one. Follow these steps to visualize the metrics:
+1. Create a Grafana instance in Azure:
+
+
+```bash
+# make sure you have the Azure Managed Grafana extension installed with az extension add --name amg
+az grafana create \
+   --resource-group $CLUSTER_RG\
+   --name keda-grafana \
+   --location $LOCATION \
+   --sku Standard
+```
+
 
 1. Import the provided Grafana dashboard JSON file located in the `grafana` folder.
 

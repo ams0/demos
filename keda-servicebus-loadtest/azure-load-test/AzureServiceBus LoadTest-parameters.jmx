@@ -1,29 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="AzureServiceBus LoadTest">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Azure Service Bus Load Test (parametrized)">
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-        <collectionProp name="Arguments.arguments">
-          <elementProp name="sb_policy_name" elementType="Argument">
-            <stringProp name="Argument.name">sb_policy_name</stringProp>
-            <stringProp name="Argument.value">${__GetSecret(sb_policy_name)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-        </collectionProp>
+        <collectionProp name="Arguments.arguments"/>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="LoadTesting">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Service Bus Load">
         <intProp name="ThreadGroup.num_threads">100</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-          <stringProp name="LoopController.loops">100</stringProp>
+          <stringProp name="LoopController.loops">1</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </ThreadGroup>
       <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="udv_SBNamespace" elementType="Argument">
+              <stringProp name="Argument.name">udv_SBNamespace</stringProp>
+              <stringProp name="Argument.value">${__BeanShell( System.getenv(&quot;SBNamespace&quot;) )}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="udv_SBQueueName" elementType="Argument">
+              <stringProp name="Argument.name">udv_SBQueueName</stringProp>
+              <stringProp name="Argument.value">${__BeanShell( System.getenv(&quot;SBQueueName&quot;) )}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="udv_SBQueueRule" elementType="Argument">
+              <stringProp name="Argument.name">udv_SBQueueRule</stringProp>
+              <stringProp name="Argument.value">${__BeanShell( System.getenv(&quot;SBQueueRule&quot;) )}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="udv_SBAccessKey" elementType="Argument">
+              <stringProp name="Argument.name">udv_SBAccessKey</stringProp>
+              <stringProp name="Argument.value">${__GetSecret(SBAccessKey)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
         <jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler guiclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.gui.AzServiceBusSamplerGui" testclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler" testname="Azure Service Bus Sampler">
           <boolProp name="createTransaction">false</boolProp>
           <stringProp name="createTransacionName"></stringProp>
@@ -32,9 +53,9 @@
           <boolProp name="rollbackTransaction">false</boolProp>
           <elementProp name="messages" elementType="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessages" guiclass="jp.co.pnop.jmeter.protocol.azureservicebus.sampler.gui.AzServiceBusMessagesPanel" testclass="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessages" testname="[res_key=Azure Event Hubs Default]">
             <collectionProp name="Messages.messages">
-              <elementProp name="Welcome to Microsoft Integration User Group!" elementType="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessage">
+              <elementProp name="Welcome to Azure Cloud Native! It&apos;s ${__time(YMDHMS)}" elementType="jp.co.pnop.jmeter.protocol.amqp.sampler.AzAmqpMessage">
                 <stringProp name="Message.messageType">String</stringProp>
-                <stringProp name="Message.message">Welcome to Microsoft Integration User Group!</stringProp>
+                <stringProp name="Message.message">Welcome to Azure Cloud Native! It&apos;s ${__time(YMDHMS)}</stringProp>
                 <stringProp name="Message.partitionKey"></stringProp>
                 <stringProp name="Message.messageId"></stringProp>
                 <stringProp name="Message.groupId"></stringProp>
@@ -49,18 +70,18 @@
             <stringProp name="connectionType">Create New Connection</stringProp>
             <stringProp name="definedConnectionName"></stringProp>
             <stringProp name="connectionName"></stringProp>
-            <stringProp name="namespaceName">keda-demo-is-rubicon.servicebus.windows.net</stringProp>
+            <stringProp name="namespaceName">${udv_SBNamespace}</stringProp>
             <stringProp name="authType">Shared access signature</stringProp>
-            <stringProp name="sharedAccessKeyName">queuerule</stringProp>
-            <stringProp name="sharedAccessKey">TFsY4n554eY/3J7fVbnF3YYj91lPmS/1u+ASbLL16C8=</stringProp>
+            <stringProp name="sharedAccessKeyName">${udv_SBQueueRule}</stringProp>
+            <stringProp name="sharedAccessKey">oYTO5jJoXuryGOsQBEcLryMrocsPf7iS8+ASbEq5cIM=</stringProp>
             <stringProp name="aadCredential"></stringProp>
             <stringProp name="destType">Queue</stringProp>
-            <stringProp name="queueName">demo-queue</stringProp>
+            <stringProp name="queueName">${udv_SBQueueName}</stringProp>
             <stringProp name="protocol">AMQP</stringProp>
           </elementProp>
         </jp.co.pnop.jmeter.protocol.azureservicebus.sampler.AzServiceBusSampler>
         <hashTree>
-          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor" enabled="true">
             <stringProp name="cacheKey">true</stringProp>
             <stringProp name="filename"></stringProp>
             <stringProp name="parameters"></stringProp>

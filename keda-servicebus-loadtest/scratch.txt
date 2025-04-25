@@ -2,15 +2,13 @@
 
 export CLUSTER_RG=keda
 export CLUSTER_NAME=scale
-export AKS_VERSION=1.32.0
+export AKS_VERSION=1.32.2
 export BASE_NODE_COUNT=2
 export NODE_MAX=5
 export NODE_MIN=2
 export LOCATION=northeurope
-export NODE_SIZE=Standard_D8ps_v5
-export TENANT_NODE_MIN_COUNT=0
-export TENANT_NODE_MAX_COUNT=10
-export TENANT_NODE_SIZE=Standard_D8s_v6
+export NODE_SIZE=standard_d8s_v6
+
 
 az group create --name $CLUSTER_RG --location $LOCATION
 az aks create \
@@ -19,6 +17,7 @@ az aks create \
     --node-count $BASE_NODE_COUNT \
     --min-count 1 \
     --max-count 5 \
+    --enable-keda \
     --node-vm-size $NODE_SIZE \
     --generate-ssh-keys \
     --location $LOCATION \
@@ -26,29 +25,20 @@ az aks create \
     --kubernetes-version $AKS_VERSION \
     --auto-upgrade-channel rapid \
     --enable-aad \
-    --enable-image-cleaner \
     --network-plugin azure \
     --network-plugin-mode overlay \
     --pod-cidr 192.168.0.0/16 \
     --network-dataplane cilium \
     --node-os-upgrade-channel NodeImage \
     --os-sku AzureLinux \
-    --enable-managed-identity \
-    --enable-addons azure-policy \
-    --enable-defender
-az aks update--enable-keda --name $CLUSTER_NAME --resource-group $CLUSTER_RG
+    --enable-managed-identity 
 
-
-    connectionFromEnv: SERVICEBUS_CONNECTIONSTRING_ENV_NAME # This must be a connection string for a queue itself, and not a namespace level (e.g. RootAccessPolicy) connection string [#215](https://github.com/kedacore/keda/issues/215)
-
-az aks get-credentials --resource-group $CLUSTER_RG --name ${CLUSTER_NAME} --admin -f \~/Desktop/kubeconfigs/$CLUSTER_RG-$CLUSTER_NAME.config
+az aks get-credentials --resource-group $CLUSTER_RG --name ${CLUSTER_NAME} --admin -f \~/Desktop/$CLUSTER_RG-$CLUSTER_NAME.config
 
 
 ## Create a Service Bus
 
-# Create a resource group
-
-SERVICE_BUS_NAMESPACE=keda-demo-is-rubicon
+SERVICE_BUS_NAMESPACE=keda-demo-azcloudative
 QUEUE_NAME=demo-queue
 
 # Create a Service Bus namespace
@@ -64,7 +54,7 @@ az servicebus queue create \
     --namespace-name $SERVICE_BUS_NAMESPACE \
     --name $QUEUE_NAME \
     --enable-partitioning true \
-    --default-message-time-to-live PT1M # Set the default message time to live to 1 minute
+    --default-message-time-to-live PT10M # Set the default message time to live to 1 minute
 
 # Create a Service Bus queue authorization rule
 az servicebus queue authorization-rule create \
@@ -118,7 +108,7 @@ spec:
     spec:
       containers:
       - name: consumer-app
-        image: ams0/consumer-app:0.9
+        image: ams0/consumer-app:1.0
         env:
         - name: SERVICEBUS_CONNECTION_STRING
           valueFrom:
@@ -127,6 +117,8 @@ spec:
               key: connection
         - name: SERVICEBUS_QUEUE_NAME
           value: "demo-queue"
+        - name: PROCESSING_DELAY_MS
+          value: "100"
 EOF
 
 kubectl apply -f - <<EOF
@@ -154,7 +146,7 @@ spec:
   - type: azure-servicebus
     metadata:
       queueName: $QUEUE_NAME
-      messageCount: "5"
+      messageCount: "50"
     authenticationRef:
         # reference to TriggerAuthentication
         name: azure-servicebus-auth
