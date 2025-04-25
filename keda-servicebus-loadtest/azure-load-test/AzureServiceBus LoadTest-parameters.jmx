@@ -73,7 +73,7 @@
             <stringProp name="namespaceName">${udv_SBNamespace}</stringProp>
             <stringProp name="authType">Shared access signature</stringProp>
             <stringProp name="sharedAccessKeyName">${udv_SBQueueRule}</stringProp>
-            <stringProp name="sharedAccessKey">oYTO5jJoXuryGOsQBEcLryMrocsPf7iS8+ASbEq5cIM=</stringProp>
+            <stringProp name="sharedAccessKey"></stringProp>
             <stringProp name="aadCredential"></stringProp>
             <stringProp name="destType">Queue</stringProp>
             <stringProp name="queueName">${udv_SBQueueName}</stringProp>
