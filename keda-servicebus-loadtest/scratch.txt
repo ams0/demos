@@ -54,7 +54,7 @@ az servicebus queue create \
     --namespace-name $SERVICE_BUS_NAMESPACE \
     --name $QUEUE_NAME \
     --enable-partitioning true \
-    --default-message-time-to-live PT10M # Set the default message time to live to 1 minute
+    --default-message-time-to-live PT10M # Set the default message time to live to 10 minute
 
 # Create a Service Bus queue authorization rule
 az servicebus queue authorization-rule create \
