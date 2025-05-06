@@ -4,5 +4,5 @@ A public repository for demos
 
 ## Index
 
-- [Public Demos](#public-demos)
-  - [Index](#index)
+- [Keda+ServiceBus+AzureLoadtest](./keda-servicebus-loadtest/)
+- [KAITO](./kaito/) 

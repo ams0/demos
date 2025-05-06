@@ -1,0 +1,22 @@
+
+replicas: 1 # for better debugging experience
+controller:
+  env:
+    # Azure client settings
+    - name: ARM_SUBSCRIPTION_ID
+      value: 1c51d1c3-d83d-4d71-ace1-df3496eddac4
+    - name: LOCATION
+      value: francecentral
+    - name: AZURE_CLUSTER_NAME
+      value: kaito
+    - name: AZURE_NODE_RESOURCE_GROUP
+      value: MC_kaito_kaito_francecentral
+    - name: ARM_RESOURCE_GROUP
+      value: kaito
+    - name: LEADER_ELECT # disable leader election for better debugging experience
+      value: "false"
+    - name: E2E_TEST_MODE
+      value: "false"
+workloadIdentity:
+  clientId: dabc3fd2-d287-4ab8-a13a-f9d3e67b6f60
+  tenantId: 30c10907-19b2-4fb8-9272-a4a539628560
