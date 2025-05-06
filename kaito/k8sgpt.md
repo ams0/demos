@@ -21,3 +21,14 @@ spec:
   repository: ghcr.io/k8sgpt-ai/k8sgpt
   version: v0.4.1
 EOF
+
+
+stern -n k8sgpt-operator-system pod/k8sgpt-kaito
+
+kubectl get results -n k8sgpt-operator-system -o json | jq .
+
+or use local cli
+
+k8sgpt auth add -b localai -u https://model.cloudnative.computer/v1 -m phi-4-mini-instruct
+
+k8sgpt analyze -n default
