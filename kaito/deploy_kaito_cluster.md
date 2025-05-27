@@ -10,22 +10,21 @@ az feature register --namespace "Microsoft.ContainerService" --name "AIToolchain
 
 
 export RG=kaito
-export AZURE_LOCATION=francecentral
+export AZURE_LOCATION=swedencentral
 export CLUSTER_NAME=kaito
 export K8S_VERSION=1.32.2
-export ACR_NAME=cndro2025
 export SUBSCRIPTION=1c51d1c3-d83d-4d71-ace1-df3496eddac4
+export MACHINE_SIZE=Standard_NC64as_T4_v3
+export MODELNAME=phi-4-mini-instruct
+export TAG="0.1.0"
+export ACR_NAME=cndro2025
 
 az group create --name $RG --location $AZURE_LOCATION
 
 az acr create --resource-group $RG --name $ACR_NAME --location $AZURE_LOCATION --sku Basic
 
-
-MODELNAME=phi-4-mini-instruct
-TAG="0.1.0"
-
+#this might take 30-60 minutes
 az acr import --no-wait -g $RG --name $ACR_NAME --source  mcr.microsoft.com/aks/kaito/kaito-$MODELNAME:$TAG --image $MODELNAME:$TAG
-
 
 az aks create --location $AZURE_LOCATION \
     --resource-group $RG \
@@ -74,12 +73,13 @@ export GPU_PROVISIONER_VERSION=0.3.3
 helm install kaito-workspace  --set clusterName=$CLUSTER_NAME --wait \
 https://github.com/kaito-project/kaito/raw/gh-pages/charts/kaito/workspace-$KAITO_WORKSPACE_VERSION.tgz --namespace kaito-workspace --create-namespace
 
-curl -sO https://raw.githubusercontent.com/Azure/gpu-provisioner/main/hack/deploy/configure-helm-values.sh
-chmod +x ./configure-helm-values.sh && ./configure-helm-values.sh $CLUSTER_NAME $RG $KAITO_IDENTITY_NAME
 kubectl apply -f https://raw.githubusercontent.com/Azure/karpenter-provider-azure/refs/heads/main/pkg/apis/crds/karpenter.sh_nodeclaims.yaml
-
-helm install gpu-provisioner --values gpu-provisioner-values.yaml --set settings.azure.clusterName=$CLUSTER_NAME --wait \
-https://github.com/Azure/gpu-provisioner/raw/gh-pages/charts/gpu-provisioner-$GPU_PROVISIONER_VERSION.tgz --namespace gpu-provisioner --create-namespace
 
 az identity federated-credential create --name kaito-federatedcredential --identity-name $KAITO_IDENTITY_NAME -g $RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:"gpu-provisioner:gpu-provisioner" --audience api://AzureADTokenExchange --subscription $SUBSCRIPTION
 
+curl -sO https://raw.githubusercontent.com/Azure/gpu-provisioner/main/hack/deploy/configure-helm-values.sh
+chmod +x ./configure-helm-values.sh && ./configure-helm-values.sh $CLUSTER_NAME $RG $KAITO_IDENTITY_NAME
+
+
+helm install gpu-provisioner --values gpu-provisioner-values.yaml --set settings.azure.clusterName=$CLUSTER_NAME --wait \
+https://github.com/Azure/gpu-provisioner/raw/gh-pages/charts/gpu-provisioner-$GPU_PROVISIONER_VERSION.tgz --namespace gpu-provisioner --create-namespace

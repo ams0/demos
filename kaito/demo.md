@@ -1,4 +1,9 @@
-# Demo
+# Kaito Demo
+
+## Beforehand
+
+Since the cluster needs to be deployed beforehand, go thru ./deploy_kaito_cluster.md first.
+
 
 Deploy the Kaito workspace beforehand
 Show the secured gateway API
