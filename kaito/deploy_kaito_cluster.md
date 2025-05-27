@@ -12,12 +12,12 @@ az feature register --namespace "Microsoft.ContainerService" --name "AIToolchain
 export RG=kaito
 export AZURE_LOCATION=swedencentral
 export CLUSTER_NAME=kaito
-export K8S_VERSION=1.32.2
+export K8S_VERSION=1.33.0
 export SUBSCRIPTION=1c51d1c3-d83d-4d71-ace1-df3496eddac4
 export MACHINE_SIZE=Standard_NC64as_T4_v3
 export MODELNAME=phi-4-mini-instruct
 export TAG="0.1.0"
-export ACR_NAME=cndro2025
+export ACR_NAME=webinar2025
 
 az group create --name $RG --location $AZURE_LOCATION
 

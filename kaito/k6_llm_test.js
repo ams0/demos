@@ -2,6 +2,8 @@
 import http from 'k6/http';
 import { sleep } from 'k6';
 
+const url = 'https://model.cloudnative.computer/v1/completions';
+const model = 'deepseek-r1-distill-llama-8b';
 const prompts = [
   "How does Python programming work?",
   "How can I learn more about neural networks?",
@@ -1008,12 +1010,12 @@ const prompts = [
 export default function () {
   const prompt = prompts[Math.floor(Math.random() * prompts.length)];
   const payload = JSON.stringify({
-    model: "phi-4-mini-instruct",
+    model: model,
     prompt: prompt,
     max_tokens: 100,
     temperature: 0
   });
   const params = { headers: { 'Content-Type': 'application/json' } };
-  http.post('https://model.cloudnative.computer/v1/completions', payload, params);
+  http.post(url, payload, params);
   sleep(1);
 }

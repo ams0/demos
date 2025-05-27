@@ -3,7 +3,7 @@
 MACHINE_SIZE=Standard_NC64as_T4_v3
 MODELNAME=phi-4-mini-instruct	
 TAG="0.1.0"
-export ACR_NAME=cndro2025
+export ACR_NAME=webinar2025
 
 kubectl apply -f - <<EOF
 apiVersion: v1
@@ -46,7 +46,7 @@ EOF
 MACHINE_SIZE=Standard_NC24ads_A100_v4
 MODELNAME=deepseek-r1-distill-llama-8b
 TAG="0.1.0"
-export ACR_NAME=cndro2025
+export ACR_NAME=webinar2025
 
 az acr import --no-wait -g $RG --name $ACR_NAME --source  mcr.microsoft.com/aks/kaito/kaito-$MODELNAME:$TAG --image $MODELNAME:$TAG
 

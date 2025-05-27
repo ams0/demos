@@ -12,6 +12,8 @@ EOF
 helm install --values helm-values/cert-manager.yaml  -n cert-manager --create-namespace cert-manager jetstack/cert-manager
 
 export CLIENT_SECRET="this-is-a-secret"
+kubectl create secret generic azuredns-config -n cert-manager --from-literal=client-secret=${CLIENT_SECRET}
+
 kubectl apply -f - <<EOF
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -99,7 +101,7 @@ spec:
     - model.cloudnative.computer
   rules:
     - backendRefs:
-        - name: workspace-phi-4-mini-instruct	
+        - name: workspace-deepseek-r1-distill-llama-8b
           port: 80
           namespace: default
 EOF

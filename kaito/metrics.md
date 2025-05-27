@@ -55,4 +55,25 @@ spec:
       targetPort: 5000
       interval: 15s
 EOF
+
+kubectl apply -f - <<EOF
+apiVersion: azmonitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: workspace-deepseek-r1-distill-llama-8b
+  labels:
+    release: prometheus  # must match your Prometheus instance's label selector
+spec:
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      kaito.sh/workspace: workspace-deepseek-r1-distill-llama-8b
+  podMetricsEndpoints:
+    - path: /metrics   # change if your metrics endpoint differs
+      targetPort: 5000
+      interval: 15s
+EOF
+
 ```

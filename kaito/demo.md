@@ -20,8 +20,9 @@ talk about vLLM, MCP and more
 
 Prompts:
 
+What is kubernetes?
+What is Kaito?
 what is the difference between K8s and vLLM?
 
 why did Kubernetes community days Romania became Cloud Native Days Romania?
 
-is Donald Trump a fascist?
