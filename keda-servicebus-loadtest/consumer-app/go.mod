@@ -18,6 +18,6 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/klauspost/compress v1.10.3 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
-	golang.org/x/crypto v0.0.0-20211115234514-b4de73f9ece8 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
